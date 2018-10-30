@@ -204,14 +204,23 @@ if { $fpga_card == "ADKU3" } {
     }
     set create_ddr4        TRUE
   }
+} elseif { $fpga_card == "AD9V3" } {
+  if { $bram_used == "TRUE" } {
+    set create_clock_conv  TRUE
+    set create_bram        TRUE
+  } elseif { $sdram_used == "TRUE" } {
+    set create_clock_conv  TRUE
+    set create_ddr4_ad9v3    TRUE
+  }
 }
+
 
 #create clock converter
 if { $create_clock_conv == "TRUE" } {
   puts "                        generating IP axi_clock_converter"
   create_ip -name axi_clock_converter -vendor xilinx.com -library ip -version 2.1 -module_name axi_clock_converter -dir $ip_dir  >> $log_file
 
-  if { ($sdram_used == "TRUE") && ( $fpga_card == "ADKU3" || $fpga_card == "S121B" || $fpga_card == "AD8K5" || $fpga_card == "S241") } {
+  if { ($sdram_used == "TRUE") && ( $fpga_card == "ADKU3" || $fpga_card == "S121B" || $fpga_card == "AD8K5" || $fpga_card == "S241" || $fpga_card == "AD9V3") } {
     set_property -dict [list CONFIG.ADDR_WIDTH {33} CONFIG.DATA_WIDTH {512} CONFIG.ID_WIDTH {4}] [get_ips axi_clock_converter]
   } else {
     set_property -dict [list CONFIG.ADDR_WIDTH {32} CONFIG.DATA_WIDTH {512} CONFIG.ID_WIDTH {4}] [get_ips axi_clock_converter]
